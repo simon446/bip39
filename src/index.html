@@ -4,6 +4,7 @@
         <meta charset="utf-8" />
         <title>BIP39 - Mnemonic Code</title>
         <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/font.css">
         <link rel="stylesheet" href="css/app.css">
         <meta content="Mnemonic code for generating deterministic keys" name="description"/>
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -12,10 +13,19 @@
         <link type="image/x-icon" rel="icon" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=" />
     </head>
     <body>
-        <div class="container">
+        <div class="container" id="main">
 
             <h1 class="text-center">Mnemonic Code Converter</h1>
             <p class="version">v0.5.6</p>
+            <hr>
+            <div class="form-group">
+                <div class="form-inline">
+                    <div class="input-group-inline">
+                            <span>Switch view to a printable version</span>:
+                        <button class="btn print-button" ><b>PRINT</b></button>
+                    </div>
+                </div>
+            </div>
             <hr>
             <div class="row">
                 <div class="col-md-12">
@@ -1114,6 +1124,8 @@
             </div>
 
         </div>
+
+        <div id="printout" class="hidden"></div>
 
         <div class="qr-container hidden">
             <div class="qr-hint bg-primary hidden">Click field to hide QR</div>

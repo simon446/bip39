@@ -58,6 +58,7 @@
     DOM.passphrase = $(".passphrase");
     DOM.generateContainer = $(".generate-container");
     DOM.generate = $(".generate");
+    DOM.printButton = $(".print-button");
     DOM.seed = $(".seed");
     DOM.rootKey = $(".root-key");
     DOM.litecoinLtubContainer = $(".litecoin-ltub-container");
@@ -156,7 +157,8 @@
         DOM.phrase.on("input", delayedPhraseChanged);
         DOM.showSplitMnemonic.on("change", toggleSplitMnemonic);
         DOM.passphrase.on("input", delayedPhraseChanged);
-        DOM.generate.on("click", generateClicked);
+        DOM.generate.on("click", generateClickedUI);
+        DOM.printButton.on("click", generatePrint);
         DOM.more.on("click", showMore);
         DOM.seed.on("input", delayedSeedChanged);
         DOM.rootKey.on("input", delayedRootKeyChanged);
@@ -603,16 +605,20 @@
         displayBip32Info();
     }
 
-    function generateClicked() {
-        if (isUsingOwnEntropy()) {
-            return;
-        }
+    function generateClickedUI() {
         // Pressing enter on BIP85 index field triggers generate click event.
         // See https://github.com/iancoleman/bip39/issues/634
         // To cancel the incorrect generation process, stop here if generate is
         // not focused.
         var buttonIsFocused = DOM.generate[0].contains(document.activeElement);
         if (!buttonIsFocused) {
+            return;
+        }
+        return generateClicked();
+    }
+
+    function generateClicked() {
+        if (isUsingOwnEntropy()) {
             return;
         }
         clearDisplay();
@@ -699,6 +705,18 @@
         // ensure entropy fields are consistent with what is being displayed
         DOM.entropyMnemonicLength.val("raw");
         return words;
+    }
+
+    function generateRandomStringNotSecure(length) {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+          result += characters.charAt(Math.floor(Math.random() * charactersLength));
+          counter += 1;
+        }
+        return result;
     }
 
     function calcBip32RootKeyFromSeed(phrase, passphrase) {
@@ -3866,6 +3884,141 @@
     }
     // ELA - Elastos functions - end
 
+    function getFirstWallet() {
+        var csv = DOM.csv.val().split("\n");
+        var row = csv[1].split(',');
+        return {
+            "path": row[0],
+            "address": row[1],
+            "public": row[2]
+        }
+    }
+
+    function generatePrivatePrintBlock(words, path) {
+        var printBlock = $('<div>', { 'class': 'print-block private-print' });
+        
+        var instructions = $('<p>').text('Only 2 out of 3 cards needed for decryption. Combine by replacing Xs with words from another card.');
+        printBlock.append(instructions);
+    
+        var yourKey = $('<p>').text('Your key:');
+        printBlock.append(yourKey);
+
+        var w = words.split(" ");
+        
+        for (var i = 1; i <= 24; i += 4) {
+            var p = $('<p>').text(`Words (${i}-${i + 3}): ${w[i-1]} ${w[i]} ${w[i+1]} ${w[i+2]}`);
+            printBlock.append(p);
+        }
+    
+        var redundancyText = $('<p>').text('For redundancy, here they are again but in reverse order by line:');
+        printBlock.append(redundancyText);
+    
+        for (i = 4; i <= 24; i += 4) {
+            p = $('<p>').text(`Words (${i}-${i - 3}): ${w[i-1]} ${w[i-2]} ${w[i-3]} ${w[i-4]}`);
+            printBlock.append(p);
+        }
+    
+        var reiterateText = $('<p>').text('To reiterate, there are 3 of these cards, this is one of them, one more card is needed to access the whole key.')
+        printBlock.append(reiterateText);
+    
+        var derivationPath = $('<p>').text(`The BIP39 derivation path is (the same one as the public adresses on the front of this card): ${path}`);
+        printBlock.append(derivationPath);
+    
+        var mnemonicToolInfo = $('<p>').html('This is a standard BIP-39 mnemonic that can be decoded to get the private key with any such tool, this tool is however recommended: https://iancoleman.io/bip39/ or via GitHub https://github.com/iancoleman/bip39.');
+        printBlock.append(mnemonicToolInfo);
+
+        return printBlock;
+    }
+
+    function generateScrambledBlock() {
+        var printBlock = $('<div>', { 'class': 'print-block scrambled-block' });
+        printBlock.html(generateRandomStringNotSecure(10000));
+
+        return printBlock;
+    }
+
+    function toQrEl(text) {
+        return libs.kjua({
+            text: text,
+            render: "canvas",
+            size: 100,
+            ecLevel: 'H',
+        });
+    }
+
+    function splitStringToParagraphs(parent, str, n) {
+        var chunks = [];
+        for (var i = 0; i < str.length; i += n) {
+            chunks.push(str.substring(i, i + n));
+        }
+        
+        chunks.forEach(function(chunk) {
+            parent.append($('<p>', { 'class': 'print-address-paragraph' }).text(chunk));
+        });
+    }
+
+    function generatePublicPrintBlock(publicWallet) {
+        var printBlock = $('<div>', { 'class': 'print-block public-print' });
+        var printWindow = $('<div>', { 'class': 'public-print-window' });
+        var addressOuter = $('<div>', { 'class': 'print-address-outer' });
+        var address = $('<div>', { 'class': 'print-address' });
+        address.append($('<p>', { 'class': 'print-address-paragraph' }).html('Address:'))
+        splitStringToParagraphs(address, publicWallet.address, 17);
+        address.append($('<p>', { 'class': 'print-address-paragraph' }).html('Balance: ________'))
+        addressOuter.append(address);
+        printWindow.append(addressOuter);
+        var qr = $('<div>', { 'class': 'print-qr-address' }).append(toQrEl(publicWallet.address))
+        printWindow.append(qr);
+        
+        printBlock.append(printWindow);
+
+        return printBlock;
+    }
+
+    function generateCard(publicWallet, words, parent, page_break) {
+        var backPage = $('<div>', { 'class': 'print-page do-page-break' });
+        backPage.append(generatePrivatePrintBlock(words, publicWallet.path));
+        backPage.append(generateScrambledBlock());
+        var frontPage = $('<div>', { 'class': 'print-page'+(page_break?" do-page-break":"") });
+        frontPage.append(generateScrambledBlock());
+        frontPage.append(generatePublicPrintBlock(publicWallet));
+        parent.append(backPage);
+        parent.append(frontPage);
+    }
+
+    function readCardsWords() {
+        var phrases = $("#phraseSplit").val();
+        console.log("phrases", phrases)
+        return phrases.split("\n").map((phrase) => phrase.substring(8));
+    }
+
+    function generatePrint() {
+        var parent = $("#printout");
+        parent.html('');
+        var cardWords = readCardsWords();
+        console.log(cardWords);
+        var publicWallet = getFirstWallet();
+        console.log(publicWallet)
+        generateCard(publicWallet, cardWords[0], parent, true);
+        generateCard(publicWallet, cardWords[1], parent, true);
+        generateCard(publicWallet, cardWords[2], parent, false);
+        $("#main").addClass('hidden');
+        parent.removeClass('hidden');
+    }
+
+    function autoGenerate() {
+        $('#strength').val('24').trigger('change');
+        generateClicked();
+    }
+
+    $(document).keyup(function(e) {
+        if (e.key === "Escape") {
+            $("#main").removeClass('hidden');
+            $("#printout").addClass('hidden');
+       }
+    });
+
     init();
 
+    autoGenerate();
 })();

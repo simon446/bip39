@@ -1,6 +1,3 @@
-body {
-    padding-bottom: 32px;
-}
 .form-control[readonly] {
     cursor: text;
 }
@@ -108,4 +105,94 @@ body {
 }
 .text-weight-normal {
     font-weight: normal !important;
+}
+.print-page { 
+    font-size: 12pt;
+    font-family: bip39standaloneUbuntu;
+    width: 100vw; 
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr; /* Defines one column that takes full width */
+    grid-template-rows: 1fr 1fr; /* Defines two rows each taking half of the height */
+    height: 100vh; /* Sets the height of the grid container to be 100% of the viewport height */
+    width: 100vw; /* Optional: Sets the width to be 100% of the viewport width */
+    box-sizing: border-box; /* Optional: Makes sure padding and border are included in the width and height */
+    margin: 0; /* Optional: Removes the default margin of the body */
+    overflow: hidden;
+}
+
+.do-page-break {
+    page-break-after: always;
+}
+
+.print-block {
+    font-size: 12pt;
+    overflow: hidden;
+}
+
+.scrambled-block {
+    font-size: 12pt;
+    line-height: 0.5;
+    width: 101%;
+    overflow-wrap: anywhere;
+}
+
+.private-print {
+    position: relative;
+    font-size: 12pt;
+    font-family: bip39standaloneUbuntu;
+    box-sizing: border-box;
+    padding: 30pt;
+    padding-top: 10pt;
+    padding-bottom: 10pt;
+}
+
+.private-print p {
+    margin: 0;
+}
+
+.public-print {
+    position: relative;
+    font-size: 12pt;
+    box-sizing: border-box;
+}
+
+.public-print-window {
+    font-size: 12pt;
+    position: absolute;
+    top: 27.457%;
+    right: 6.631%;
+    height: 21.492%;
+    width: 43.248%;
+    border: 2px solid black;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    margin: 0;
+    padding-left: 10pt;
+}
+
+.print-public-key {
+    font-size: 8pt;
+}
+
+.print-address-paragraph {
+    margin: 0;
+}
+
+.print-address-outer, .print-qr-address-outer {
+    height: 100%;
+    position: relative;
+}
+
+.print-address, .print-qr-address canvas {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.print-qr-address canvas {
+    right: 30pt;
 }
