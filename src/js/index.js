@@ -3897,10 +3897,10 @@
     function generatePrivatePrintBlock(words, path) {
         var printBlock = $('<div>', { 'class': 'print-block private-print' });
         
-        var instructions = $('<p>').text('Only 2 out of 3 cards needed for decryption. Combine by replacing Xs with words from another card.');
+        var instructions = $('<p>').text('To decrypt your key, you\'ll need two out of three cards. Fuse the cards by filling in the blanks (XXXX) using words from another card. ');
         printBlock.append(instructions);
     
-        var yourKey = $('<p>').text('Your key:');
+        var yourKey = $('<p>').text('Below is the relevant section of your key:');
         printBlock.append(yourKey);
 
         var w = words.split(" ");
@@ -3910,7 +3910,7 @@
             printBlock.append(p);
         }
     
-        var redundancyText = $('<p>').text('For redundancy, here they are again but in reverse order by line:');
+        var redundancyText = $('<p>').text('For redundancy, here\'s the reverse order of the same lines:');
         printBlock.append(redundancyText);
     
         for (i = 4; i <= 24; i += 4) {
@@ -3918,14 +3918,11 @@
             printBlock.append(p);
         }
     
-        var reiterateText = $('<p>').text('To reiterate, there are 3 of these cards, this is one of them, one more card is needed to access the whole key.')
+        var reiterateText = $('<p>').text('Please note, you require one additional card to reveal the full key.')
         printBlock.append(reiterateText);
     
-        var derivationPath = $('<p>').text(`The BIP39 derivation path is (the same one as the public adresses on the front of this card): ${path}`);
+        var derivationPath = $('<p>').text(`This key follows the BIP39 derivation path: ${path}, this leads to the address displayed on this card's front. Use this mnemonic to decode the private key using any BIP-39 compatible tool. Recommended tools for this process are available at https://iancoleman.io/bip39/ or the GitHub repository https://github.com/iancoleman/bip39.`);
         printBlock.append(derivationPath);
-    
-        var mnemonicToolInfo = $('<p>').html('This is a standard BIP-39 mnemonic that can be decoded to get the private key with any such tool, this tool is however recommended: https://iancoleman.io/bip39/ or via GitHub https://github.com/iancoleman/bip39.');
-        printBlock.append(mnemonicToolInfo);
 
         return printBlock;
     }
@@ -3959,7 +3956,7 @@
 
     function generatePublicPrintBlock(publicWallet) {
         var printBlock = $('<div>', { 'class': 'print-block public-print' });
-        var printWindow = $('<div>', { 'class': 'public-print-window' });
+        var printWindow = $('<div>', { 'class': 'public-letter-window public-print-window' });
         var addressOuter = $('<div>', { 'class': 'print-address-outer' });
         var address = $('<div>', { 'class': 'print-address' });
         address.append($('<p>', { 'class': 'print-address-paragraph' }).html('Address:'))
