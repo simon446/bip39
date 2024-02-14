@@ -211,7 +211,7 @@
     position: relative;
 }
 
-.print-address, .print-qr-address canvas {
+.print-address, .print-qr-address svg {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);

@@ -3935,7 +3935,7 @@
     }
 
     function toQrEl(text) {
-        let qr = libs.kjua({
+        return libs.kjua({
             text: text,
             crisp: true,
             render: "svg",
@@ -3943,7 +3943,6 @@
             size: 100,
             ecLevel: 'H',
         });
-        return qr;
     }
 
     function splitStringToParagraphs(parent, str, n) {
