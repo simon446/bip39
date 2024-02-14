@@ -157,16 +157,18 @@
     box-sizing: border-box;
 }
 
-.public-print-window {
+.public-letter-window {
     font-size: 12pt;
     position: absolute;
     top: 27.457%;
     right: 6.631%;
     height: 21.492%;
     width: 43.248%;
+}
+
+.public-print-window {
     border: 2px solid black;
     box-sizing: border-box;
-
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;

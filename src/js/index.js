@@ -3935,12 +3935,15 @@
     }
 
     function toQrEl(text) {
-        return libs.kjua({
+        let qr = libs.kjua({
             text: text,
-            render: "canvas",
+            crisp: true,
+            render: "svg",
+            color: "#000",
             size: 100,
             ecLevel: 'H',
         });
+        return qr;
     }
 
     function splitStringToParagraphs(parent, str, n) {
@@ -3954,31 +3957,40 @@
         });
     }
 
-    function generatePublicPrintBlock(publicWallet) {
+    function generatePublicPrintBlock(publicWallet, card_number) {
         var printBlock = $('<div>', { 'class': 'print-block public-print' });
-        var printWindow = $('<div>', { 'class': 'public-letter-window public-print-window' });
-        var addressOuter = $('<div>', { 'class': 'print-address-outer' });
-        var address = $('<div>', { 'class': 'print-address' });
-        address.append($('<p>', { 'class': 'print-address-paragraph' }).html('Address:'))
-        splitStringToParagraphs(address, publicWallet.address, 17);
-        address.append($('<p>', { 'class': 'print-address-paragraph' }).html('Balance: ________'))
-        addressOuter.append(address);
-        printWindow.append(addressOuter);
-        var qr = $('<div>', { 'class': 'print-qr-address' }).append(toQrEl(publicWallet.address))
-        printWindow.append(qr);
-        
-        printBlock.append(printWindow);
+        printBlock.append(generatePublicPrintTitleWindow(`This is Card ${card_number}/3 of a Bitcoin shard wallet. It partially reveals a BIP39 mnemonic that, when combined with any one of the other two cards, grants full access to your Bitcoin funds. Two of three cards are necessary to form the complete mnemonic. The Bitcoin public address below matches across all cards. It's for monitoring only — no spending can occur from this address directly. Keep this card secure. Open only if you plan to access and spend the Bitcoin.`));
+        printBlock.append(generatePublicPrintWindow(publicWallet));
 
         return printBlock;
     }
 
-    function generateCard(publicWallet, words, parent, page_break) {
+    function generatePublicPrintWindow(publicWallet) {
+        var printWindow = $('<div>', { 'class': 'public-letter-window public-print-window' });
+        var addressOuter = $('<div>', { 'class': 'print-address-outer' });
+        var address = $('<div>', { 'class': 'print-address' });
+        address.append($('<p>', { 'class': 'print-address-paragraph' }).html('BTC Address:'))
+        splitStringToParagraphs(address, publicWallet.address, 17);
+        addressOuter.append(address);
+        printWindow.append(addressOuter);
+        var qr = $('<div>', { 'class': 'print-qr-address' }).append(toQrEl(publicWallet.address))
+        printWindow.append(qr);
+        return printWindow;
+    }
+
+    function generatePublicPrintTitleWindow(text) {
+        var printWindow = $('<div>', { 'class': 'public-print-title-window' });
+        printWindow.append($('<p>', { 'class': 'print-address-paragraph-title' }).html(text))
+        return printWindow;
+    }
+
+    function generateCard(publicWallet, words, parent, page_break, card_number) {
         var backPage = $('<div>', { 'class': 'print-page do-page-break' });
         backPage.append(generatePrivatePrintBlock(words, publicWallet.path));
         backPage.append(generateScrambledBlock());
         var frontPage = $('<div>', { 'class': 'print-page'+(page_break?" do-page-break":"") });
         frontPage.append(generateScrambledBlock());
-        frontPage.append(generatePublicPrintBlock(publicWallet));
+        frontPage.append(generatePublicPrintBlock(publicWallet, card_number));
         parent.append(backPage);
         parent.append(frontPage);
     }
@@ -3996,9 +4008,9 @@
         console.log(cardWords);
         var publicWallet = getFirstWallet();
         console.log(publicWallet)
-        generateCard(publicWallet, cardWords[0], parent, true);
-        generateCard(publicWallet, cardWords[1], parent, true);
-        generateCard(publicWallet, cardWords[2], parent, false);
+        generateCard(publicWallet, cardWords[0], parent, true, 1);
+        generateCard(publicWallet, cardWords[1], parent, true, 2);
+        generateCard(publicWallet, cardWords[2], parent, false, 3);
         $("#main").addClass('hidden');
         parent.removeClass('hidden');
     }
