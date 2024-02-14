@@ -194,8 +194,8 @@
 .public-letter-window {
     font-size: 12pt;
     position: relative;
-    height: 21.492%;
-    width: 43.248%;
+    height: 276px;
+    width: 90%;
 }
 
 .print-public-key {
@@ -203,6 +203,8 @@
 }
 
 .print-address-paragraph {
+    font-size: 24pt;
+    text-align: center;
     margin: 0;
 }
 
@@ -215,17 +217,14 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+    width: 100%;
 }
 
 .print-qr-address canvas {
     right: 30pt;
 }
 
-.nn128 {
-    image-rendering: optimizeSpeed;             /* Older versions of FF          */
-    image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
-    image-rendering: -webkit-optimize-contrast; /* Safari                        */
-    image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
-    image-rendering: pixelated;                 /* Awesome future-browsers       */
-    -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+.qr-code {
+    width: 100px;
+    height: 100px;
 }

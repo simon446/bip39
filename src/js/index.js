@@ -3935,14 +3935,15 @@
     }
 
     function toQrEl(text) {
-        return libs.kjua({
+        let qr = libs.kjua({
             text: text,
-            crisp: true,
             render: "svg",
+            size: 256,
             color: "#000",
-            size: 100,
             ecLevel: 'H',
         });
+        $(qr).addClass('qr-code');
+        return qr;
     }
 
     function splitStringToParagraphs(parent, str, n) {
@@ -3958,7 +3959,7 @@
 
     function generatePublicPrintBlock(publicWallet, card_number) {
         var printBlock = $('<div>', { 'class': 'print-block public-print' });
-        printBlock.append(generatePublicPrintTitleWindow(`This is Card ${card_number}/3 of a Bitcoin shard wallet. It partially reveals a BIP39 mnemonic that, when combined with any one of the other two cards, grants full access to your Bitcoin funds. Two of three cards are necessary to form the complete mnemonic. The Bitcoin public address below matches across all cards. It's for monitoring only — no spending can occur from this address directly. Keep this card secure. Open only if you plan to access and spend the Bitcoin.`));
+        printBlock.append(generatePublicPrintTitleWindow(`This is Card ${card_number}/3 of a BIP39 shard wallet. It partially reveals a BIP39 mnemonic that, when combined with any one of the other two cards, grants full access to your funds. Two of three cards are necessary to form the complete mnemonic. The public address below matches across all cards. It's for monitoring only — no spending can occur from this address directly. Keep this card secure. Open only if you plan to access and spend the funds.`));
         printBlock.append(generatePublicPrintWindow(publicWallet));
 
         return printBlock;
@@ -3968,7 +3969,7 @@
         var printWindow = $('<div>', { 'class': 'public-letter-window public-print-window' });
         var addressOuter = $('<div>', { 'class': 'print-address-outer' });
         var address = $('<div>', { 'class': 'print-address' });
-        address.append($('<p>', { 'class': 'print-address-paragraph' }).html('BTC Address:'))
+        address.append($('<p>', { 'class': 'print-address-paragraph' }).html(publicWallet.path))
         splitStringToParagraphs(address, publicWallet.address, 17);
         addressOuter.append(address);
         printWindow.append(addressOuter);
